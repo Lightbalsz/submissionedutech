@@ -49,4 +49,4 @@ def prediction(processed_data):
     pred = model.predict(processed_data)[0]
     print(f"Value of pred: {pred}") 
     print(f"Type of pred: {type(pred)}") 
-return "Graduate" if pred == 0 else "Dropout"
+    return "Graduate" if pred == 0 else "Dropout"

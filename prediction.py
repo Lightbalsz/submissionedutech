@@ -3,8 +3,8 @@ import joblib
 import pandas as pd
 
 # Load model dan scaler yang baru
-model = joblib.load("model_dropout_compatible.pkl")
-scaler = joblib.load("scaler_compatible.pkl")
+model = joblib.load("model_dropout.pkl")
+scaler = joblib.load("scaler.pkl")
 
 # Mapping kategori manual
 def map_input(gender, debtor, tuition_fees, scholarship_holder):

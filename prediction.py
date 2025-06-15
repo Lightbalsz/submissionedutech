@@ -2,11 +2,11 @@ import numpy as np
 import joblib
 import pandas as pd
 
-# Load model & scaler (hanya sekali saat file diimport)
+# Load model dan scaler sekali saja
 model = joblib.load("model_dropout.pkl")
 scaler = joblib.load("scaler.pkl")
 
-# Mapping kategori manual
+# Mapping input kategori ke angka
 def map_input(gender, debtor, tuition_fees, scholarship_holder):
     return [
         1 if gender == "Perempuan" else 0,
@@ -15,13 +15,13 @@ def map_input(gender, debtor, tuition_fees, scholarship_holder):
         1 if scholarship_holder == "Ya" else 0
     ]
 
-# Fungsi preprocessing: ubah input mentah jadi format fitur model
+# Fungsi preprocessing input user
 def data_preprocessing(input_array):
-    numeric_part = np.array(input_array[:8] + input_array[8:9], dtype=float)  # 9 kolom numerik
-    categorical_part = map_input(*input_array[9:])  # 4 kolom kategori
+    numeric_part = np.array(input_array[:9], dtype=float)
+    categorical_part = map_input(*input_array[9:])
     full_data = np.concatenate([numeric_part, categorical_part]).reshape(1, -1)
 
-    # Standarisasi data numerik saja
+    # Skalakan seluruh fitur
     X_scaled = scaler.transform(full_data)
     df_scaled = pd.DataFrame(X_scaled, columns=[
         'Curricular_units_1st_sem_enrolled',

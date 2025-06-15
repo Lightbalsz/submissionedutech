@@ -53,7 +53,7 @@ def prediction(processed_data, input_array):
     grade_avg = (float(input_array[4]) + float(input_array[5])) / 2  # rata-rata grade
     unit_approved_total = int(input_array[2]) + int(input_array[3])  # total unit approved
 
-    if tuition_fees >= 0 and grade_avg >= 10 and unit_approved_total >= 7:
+    if tuition_fees == "Ya" and grade_avg >= 10 and unit_approved_total >= 7:
         return "Graduate"
 
     # --- ML BASED PREDICTION ---

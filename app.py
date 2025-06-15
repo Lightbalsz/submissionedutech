@@ -91,4 +91,4 @@ if st.button("🔮 Predict Dropout"):
     if result == "Graduate":
         st.success("🎓 Selamat! Siswa diprediksi akan LULUS.")
     else:
-        st.error("⚠️ Siswa berpotensi mengalami DROPOUT. Perlu perhatian lebih.")
+        st.error("⚠️ Siswa berpotensi mengalami DROPOUT. Perlu perhatian lebih.{result}")

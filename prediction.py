@@ -6,15 +6,6 @@ import pandas as pd
 model = joblib.load("model_dropout.pkl")
 scaler = joblib.load("scaler.pkl")
 
-# Mapping nilai kategorikal
-def map_input(gender, debtor, tuition_fees, scholarship_holder):
-    return [
-        1 if gender == "Perempuan" else 0,
-        1 if debtor == "Ya" else 0,
-        1 if tuition_fees == "Ya" else 0,
-        1 if scholarship_holder == "Ya" else 0
-    ]
-
 # Urutan kolom yang dipakai oleh model
 FEATURE_ORDER = [
     'Curricular_units_1st_sem_enrolled',
@@ -32,21 +23,39 @@ FEATURE_ORDER = [
     'Scholarship_holder'
 ]
 
+# Mapping nilai kategorikal ke biner
+def map_input(gender, debtor, tuition_fees, scholarship_holder):
+    return [
+        1 if gender == "Perempuan" else 0,
+        1 if debtor == "Ya" else 0,
+        1 if tuition_fees == "Ya" else 0,
+        1 if scholarship_holder == "Ya" else 0
+    ]
+
+# Fungsi preprocessing
 def data_preprocessing(input_array):
-    # Pisahkan numerik & kategorikal
-    numeric_part = np.array(input_array[:9], dtype=float)  # 9 numerik
-    categorical_part = np.array(map_input(*input_array[9:]), dtype=int)  # 4 kategorikal
-    full_input = np.concatenate([numeric_part, categorical_part]).reshape(1, -1)
+    # Pecah input menjadi numerik & kategorikal
+    numeric_part = np.array(input_array[:9], dtype=float)  # 9 fitur numerik
+    categorical_part = np.array(map_input(*input_array[9:]), dtype=int)  # 4 fitur kategorikal
+
+    # Gabungkan dan buat dataframe dengan nama kolom
+    full_input = np.concatenate([numeric_part, categorical_part])
+    df_input = pd.DataFrame([full_input], columns=FEATURE_ORDER)
 
     # Scaling
-    scaled = scaler.transform(full_input)
-
-    # Buat DataFrame dengan urutan kolom model
-    df_scaled = pd.DataFrame(scaled, columns=FEATURE_ORDER)
+    df_scaled = pd.DataFrame(scaler.transform(df_input), columns=FEATURE_ORDER)
     return df_scaled
 
-def prediction(processed_data):
+# Fungsi prediksi dengan rule tambahan
+def prediction(processed_data, input_array):
+    # --- RULE OVERRIDE ---
+    tuition_fees = input_array[11]
+    grade_avg = (float(input_array[4]) + float(input_array[5])) / 2
+    approved_total = int(input_array[2]) + int(input_array[3])
+
+    if tuition_fees == "Ya" and grade_avg >= 10 and approved_total >= 7:
+        return "Graduate"
+
+    # --- PREDIKSI MODEL ---
     pred = model.predict(processed_data)[0]
-    print(f"Value of pred: {pred}") 
-    print(f"Type of pred: {type(pred)}") 
     return "Graduate" if pred == 0 else "Dropout"

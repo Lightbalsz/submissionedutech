@@ -83,7 +83,7 @@ data_input = [
 # Prediksi
 if st.button("🔮 Predict Dropout"):
     data_preprocessed = data_preprocessing(data_input)
-    result = prediction(data_preprocessed)
+    result = prediction(data_preprocessed, data_input)
 
     with st.expander("Lihat data setelah preprocessing"):
         st.dataframe(data_preprocessed)

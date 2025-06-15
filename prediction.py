@@ -47,4 +47,4 @@ def data_preprocessing(input_array):
 
 def prediction(processed_data):
     pred = model.predict(processed_data)[0]
-    return "Dropout" if pred == 1 else "Graduate"
+    return "Graduate" if pred == 0 else "Dropout"

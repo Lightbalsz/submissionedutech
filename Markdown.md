@@ -82,7 +82,7 @@ streamlit run app.py
 4. Setelah berhasil dijalankan, masukkan data yang sesuai kemudian klik tombol **Predict** untuk mengetahui status siswa tersebut.
 
 Sedangkan untuk menjalankannya melalui link, bisa diakses dengan klik link berikut:
-[Akan ditambahkan jika dideploy ke Streamlit Cloud]
+https://pei7kmycyzqe3fprgdy854.streamlit.app/
 ## Conclusion
 Proyek ini berhasil membangun sistem prediksi dropout yang dapat mengidentifikasi siswa berisiko tinggi berdasarkan data historis akademik dan administratif. Dengan sistem ini, Jaya Jaya Institut dapat mengambil langkah proaktif dalam memberikan intervensi atau bimbingan kepada siswa yang membutuhkan.
 

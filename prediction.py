@@ -47,4 +47,6 @@ def data_preprocessing(input_array):
 
 def prediction(processed_data):
     pred = model.predict(processed_data)[0]
-    return "Graduate" if pred >= 0 else "Dropout"
+    print(f"Value of pred: {pred}") 
+    print(f"Type of pred: {type(pred)}") 
+return "Graduate" if pred == 0 else "Dropout"

@@ -1,49 +1,92 @@
 import numpy as np
-import joblib
 import pandas as pd
+import joblib
+from pathlib import Path
 
-# Load model dan scaler sekali saja
-model = joblib.load("model_dropout.pkl")
-scaler = joblib.load("scaler.pkl")
+# -----------------------------------------------------------------------
+# 1.  Muat artefak yang sudah diserialisasi (model & scaler)
+# -----------------------------------------------------------------------
+MODEL_PATH = Path(__file__).with_name("model_dropout.pkl")
+SCALER_PATH = Path(__file__).with_name("scaler.pkl")
 
-# Mapping input kategori ke angka
+model = joblib.load(MODEL_PATH)
+scaler = joblib.load(SCALER_PATH)
+
+# -----------------------------------------------------------------------
+# 2.  Helper untuk mengonversi input kategori ke numerik (0/1)
+# -----------------------------------------------------------------------
 def map_input(gender, debtor, tuition_fees, scholarship_holder):
+    """Konversi pilihan UI menjadi nilai biner."""
     return [
         1 if gender == "Perempuan" else 0,
         1 if debtor == "Ya" else 0,
         1 if tuition_fees == "Ya" else 0,
-        1 if scholarship_holder == "Ya" else 0
+        1 if scholarship_holder == "Ya" else 0,
     ]
 
-# Fungsi preprocessing input user
-def data_preprocessing(input_array):
-    numeric_part = np.array(input_array[:9], dtype=float)
-    categorical_part = map_input(*input_array[9:])
-    full_data = np.concatenate([numeric_part, categorical_part]).reshape(1, -1)
+# -----------------------------------------------------------------------
+# 3.  Fungsi pra-proses untuk data masukan dari Streamlit
+# -----------------------------------------------------------------------
+def data_preprocessing(raw_list):
+    """
+    Parameters
+    ----------
+    raw_list : list
+        13 elemen dengan urutan:
+        [curr_1st_enrolled, curr_2nd_enrolled, curr_1st_approved,
+         curr_2nd_approved, curr_1st_grade, curr_2nd_grade,
+         curr_1st_eval, curr_2nd_eval, age_at_enrollment,
+         gender, debtor, tuition_fees, scholarship_holder]
 
-    # Skalakan seluruh fitur
-    X_scaled = scaler.transform(full_data)
-    df_scaled = pd.DataFrame(X_scaled, columns=[
-        'Curricular_units_1st_sem_enrolled',
-        'Curricular_units_2nd_sem_enrolled',
-        'Curricular_units_1st_sem_approved',
-        'Curricular_units_2nd_sem_approved',
-        'Curricular_units_1st_sem_grade',
-        'Curricular_units_2nd_sem_grade',
-        'Curricular_units_1st_sem_evaluations',
-        'Curricular_units_2nd_sem_evaluations',
-        'Age_at_enrollment',
-        'Gender',
-        'Debtor',
-        'Tuition_fees_up_to_date',
-        'Scholarship_holder'
-    ])
-    return df_scaled
+    Returns
+    -------
+    pd.DataFrame
+        Satu baris DataFrame yang sudah siap masuk ke model.predict
+    """
+    # --- Pisahkan numerik & kategorikal ---
+    numeric_vals = np.asarray(raw_list[:9], dtype=float).reshape(1, -1)
+    categorical_vals = np.asarray(
+        map_input(*raw_list[9:]), dtype=int
+    ).reshape(1, -1)
 
-# Fungsi prediksi
-def prediction(processed_data):
-    pred = model.predict(processed_data)[0]
-    if pred == 1:
-        return "Dropout"
-    else:
-        return "Graduate"
+    # --- Scale hanya bagian numerik ---
+    numeric_scaled = scaler.transform(numeric_vals)
+
+    # --- Gabungkan kembali ---
+    all_features = np.hstack([numeric_scaled, categorical_vals])
+
+    # --- Buat DataFrame dengan nama kolom konsisten ---
+    columns = [
+        "Curricular_units_1st_sem_enrolled",
+        "Curricular_units_2nd_sem_enrolled",
+        "Curricular_units_1st_sem_approved",
+        "Curricular_units_2nd_sem_approved",
+        "Curricular_units_1st_sem_grade",
+        "Curricular_units_2nd_sem_grade",
+        "Curricular_units_1st_sem_evaluations",
+        "Curricular_units_2nd_sem_evaluations",
+        "Age_at_enrollment",
+        "Gender",
+        "Debtor",
+        "Tuition_fees_up_to_date",
+        "Scholarship_holder",
+    ]
+    return pd.DataFrame(all_features, columns=columns)
+
+# -----------------------------------------------------------------------
+# 4.  Fungsi prediksi akhir
+# -----------------------------------------------------------------------
+def prediction(processed_df):
+    """
+    Parameters
+    ----------
+    processed_df : pd.DataFrame
+        Output dari data_preprocessing()
+
+    Returns
+    -------
+    str
+        'Dropout' jika model memprediksi 1, else 'Graduate'.
+    """
+    pred = model.predict(processed_df)[0]
+    return "Dropout" if pred == 1 else "Graduate"

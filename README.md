@@ -60,7 +60,7 @@ jupyter-notebook .
 ## Business Dashboard
 Business dashboard dibangun menggunakan Streamlit yang menampilkan input form, informasi siswa, serta hasil prediksi dropout secara individual. Dashboard ini membantu staf akademik dalam mengidentifikasi siswa yang membutuhkan perhatian khusus.
 
-> Link akses dashboard (jika online): [Akan ditambahkan jika dideploy ke Streamlit Cloud]
+> Link akses dashboard (jika online): https://public.tableau.com/authoring/iqbaledutechh/Dashboard1#1
 
 ## Menjalankan Sistem Machine Learning
 Prototype aplikasi machine learning telah dibuat dalam bentuk web app menggunakan Streamlit.
